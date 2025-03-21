@@ -1,0 +1,94 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\Task\StoreTaskRequest;
+use App\Http\Requests\Task\UpdateTaskRequest;
+use App\Models\Task;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+
+class TaskController extends Controller
+{
+    /**
+     * Display a listing of the tasks.
+     *
+     * @param Request $request
+     * @return \Inertia\Response
+     */
+    public function index()
+    {
+        $tasks = Task::orderBy('created_at', 'desc')->get();
+
+        return Inertia::render('Tasks/Index', [
+            'tasks' => $tasks,
+        ]);
+    }
+
+        /**
+     * Display the specified task.
+     *
+     * @param Task $task
+     * @return \Inertia\Response
+     */
+    public function show(Task $task)
+    {
+        // The $task parameter will be automatically resolved via route model binding
+        // This means Laravel will fetch the task with the ID from the route
+        // or return a 404 if not found
+        
+        return Inertia::render('Tasks/Show', [
+            'task' => $task
+        ]);
+    }
+    
+    /**
+     * Store a newly created task in storage.
+     *
+     * @param StoreTaskRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function store(StoreTaskRequest $request)
+    {
+        // Create the task with validated data
+        $task = Task::create($request->validated());
+
+        // Redirect back to the tasks index with a success message
+        return redirect()->route('tasks.index')
+            ->with('message', 'Task created successfully!');
+    }
+    
+    /**
+     * Update the specified task in storage.
+     *
+     * @param \App\Http\Requests\Task\UpdateTaskRequest $request
+     * @param \App\Models\Task $task
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function update(UpdateTaskRequest $request, Task $task)
+    {
+        // Update the task with validated data
+        $task->update($request->validated());
+
+        // Redirect back with a success message
+        return redirect()->route('tasks.index')
+            ->with('message', 'Task updated successfully!');
+    }
+
+    /**
+     * Remove the specified task from storage.
+     *
+     * @param \App\Models\Task $task
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy(Task $task)
+    {
+        // Delete the task
+        $task->delete();
+
+        // Redirect back with a success message
+        return redirect()->route('tasks.index')
+            ->with('message', 'Task deleted successfully!');
+    }
+
+}
