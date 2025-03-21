@@ -28,6 +28,11 @@ class TaskController extends Controller
         $perPage = $request->input('per_page', config('api-tool-kit.default_pagination_number'));
         $tasks = Task::useFilters()->dynamicPaginate($perPage);
 
+            // Ensure sorting by 'created_at' in descending order by default
+        $tasks = Task::useFilters()
+            ->orderBy('created_at', 'desc') // Explicitly apply default sorting
+            ->dynamicPaginate($perPage);
+
         return Inertia::render('Tasks/Index', [
             'tasks' => $tasks,
         ]);
